@@ -1,49 +1,45 @@
-# Starlight Starter Kit: Basics
+# Study Astro
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+AstroとStarlightでドキュメントサイトを作る。
 
-```
-npm create astro@latest -- --template starlight
-```
+* [Astro](https://docs.astro.build/ja/getting-started/)
+* [Starlight](https://starlight.astro.build)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## How to build
 
-## 🚀 Project Structure
+**Node.jsの準備**:
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```console
+% node --version
+v24.13.0
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+**npmパッケージのインストール**:
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+```
+npm install
+```
 
-Static assets, like favicons, can be placed in the `public/` directory.
+**開発サーバーの起動**:
 
-## 🧞 Commands
+開発用にビルドしてWebサーバーを立ち上げます。ドキュメントの変更を監視してライブリロードします。
 
-All commands are run from the root of the project, from a terminal:
+```
+npm run dev
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+**ビルド**:
 
-## 👀 Want to learn more?
+ドキュメントをビルドします。 `dist` フォルダに出力されます。
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+```
+npm run build
+```
+
+**ビルドの確認**
+
+ビルドした内容を確認します。 `dev` とは異なりファイルの監視やライブリロードはありません。
+
+```
+npm run preview
+```
