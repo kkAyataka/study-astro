@@ -1,64 +1,21 @@
-#---------------------------------------
-# Windows Visual Studio
-#---------------------------------------
-build
-ipch
-*.user
-*.opensdf
-*.sdf
-*.suo
-*.vs
+# build output
+dist/
+# generated types
+.astro/
 
-#---------------------------------------
-# Mac Xcode
-#---------------------------------------
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
 .DS_Store
-build/
-DerivedData
-# Various settings
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
-# Other
-*.xccheckout
-*.moved-aside
-*.xcuserstate
-*.xcscmblueprint
-# Obj-C/Swift specific
-*.hmap
-*.ipa
-
-#---------------------------------------
-# Linux automake
-#---------------------------------------
-# autoscan
-/autoscan.log
-/configure.scan
-# autoheader
-/config.h.in
-# aclocal
-/aclocal.m4
-/autom4te.cache
-# automake
-Makefile.in
-/depcomp
-/install-sh
-/missing
-# autoconf
-/configure
-# configure
-Makefile
-.deps
-/config.h
-/config.log
-/config.status
-/stamp-h1
-# make
-*.o
-/config.h.in~
