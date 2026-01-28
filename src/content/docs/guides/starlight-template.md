@@ -1,6 +1,8 @@
 ---
 title: Starlightテンプレート
 lastUpdated: 2026-01-25
+sidebar:
+  order: 2
 ---
 
 ## AstroとStarlightのドキュメント
