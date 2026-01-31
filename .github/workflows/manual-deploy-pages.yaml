@@ -1,0 +1,48 @@
+name: 'Manual: Deploy GitHub Pages'
+
+run-name: 'Deploy GitHub Pages'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [ubuntu-slim]
+
+    steps:
+      - name: Checkout
+        # https://github.com/actions/checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        # https://github.com/actions/setup-node
+        uses: ruby/setup-node@v6
+        with:
+          node-version: 'lts/Krypton' # v24
+
+      - name: Build
+        run: npm ci && npm run build
+
+      - name: Upload files as artifact
+        # https://github.com/actions/upload-pages-artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+
+    runs-on: [ubuntu-slim]
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        # https://github.com/actions/deploy-pages
+        uses: actions/deploy-pages@v4
