@@ -8,6 +8,7 @@ export default defineConfig({
 		starlight({
 			title: 'Study Astro',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/kkayataka/study-astro' }],
+			lastUpdated: true,
 			sidebar: [
 				{
 					label: 'Guides',
