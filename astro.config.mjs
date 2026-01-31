@@ -13,11 +13,21 @@ export default defineConfig({
 					label: 'Guides',
 					autogenerate: { directory: 'guides' },
 				},
+				// Reference
 				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					label: 'Sub1',
+					autogenerate: { directory: 'reference/sub1' },
+				},
+				{
+					label: 'Sub2',
+					autogenerate: { directory: 'reference/sub2' },
 				},
 			],
+			components: {
+				// Override the default `SocialIcons` component.
+				Sidebar: './src/components/Sidebar.astro',
+      		},
+			routeMiddleware: `./src/routeMiddleware.ts`
 		}),
 	],
 });

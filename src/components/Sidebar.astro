@@ -1,0 +1,82 @@
+---
+import Default from "@astrojs/starlight/components/Sidebar.astro";
+
+// link button data
+const links = [
+  { label: "Guides", href: "/guides/getting-started/" },
+  { label: "Reference", href: "/reference/sub1/example1/" },
+];
+
+// checks a page is in a link group
+const current = Astro.url.pathname;
+const isActive = (href) => {
+  if (href === "/") {
+    return current === "/";
+  }
+
+  const group = href.substring(0, href.indexOf('/', 1));
+  return current.startsWith(group);
+};
+---
+
+<nav class="my-sidebar">
+  <div class="my-fixed-links">
+    <div class="my-fixed-links-grid">
+      {links.map((item) => (
+        <a
+          class={`my-fixed-link ${isActive(item.href) ? "active" : ""}`}
+          href={item.href}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- Default Sidebar -->
+  <Default><slot /></Default>
+</nav>
+
+<style>
+  .my-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .my-fixed-links {
+    padding: 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-black);
+  }
+
+  .my-fixed-links-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sl-color-gray-2);
+    margin-bottom: 0.5rem;
+  }
+
+  .my-fixed-links-grid {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .my-fixed-link {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    border-radius: 0.6rem;
+    text-decoration: none;
+    color: var(--sl-color-white);
+    background: var(--sl-color-gray-6);
+  }
+
+  .my-fixed-link:hover {
+    background: var(--sl-color-gray-5);
+  }
+
+  .my-fixed-link.active {
+    outline: 2px solid var(--sl-color-accent-high);
+  }
+</style>
