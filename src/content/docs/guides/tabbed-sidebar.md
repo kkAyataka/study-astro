@@ -140,7 +140,7 @@ Starlight Examplesにそのままの例があるので、そちらから拝借�
 * [Starlight Examples](https://starlight-examples.netlify.app/examples/multi-sidebar/)
 * [Route Data](https://starlight.astro.build/guides/route-data/)
 
-`src/routeMiddleware.ts`
+`src/routeMiddleware.ts`:
 
 ```ts
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
@@ -214,4 +214,46 @@ export default defineConfig({
 		}),
 	],
 });
+```
+
+## GitHub Pages向けの調整
+
+GitHub Pagesでカスタムドメインを使用しない場合、URLにはリポジトリ名が含まれます。URLが変わるため、これに合わせた調整が必要になります。
+
+`Sidebar.astro` ではリンクを修正するほか、URLの解析時にリポジトリ名は飛ばしてトップディレクトリ名を取得するようにします。
+
+`src/components/Sidebar.astro`:
+
+```astro
+---
+import Default from "@astrojs/starlight/components/Sidebar.astro";
+
+// link button data
+const links = [
+  { label: "Guides", href: "/study-astro/guides/getting-started/" },
+  { label: "Reference", href: "/study-astro/reference/sub1/example1/" },
+];
+
+// checks a page is in a link group
+const current = Astro.url.pathname;
+const isActive = (href) => {
+  if (href === "/") {
+    return current === "/";
+  }
+
+  const group = href.split('/')[2];
+  return current.split('/')[2] === group;
+};
+---
+```
+
+`routeMiddleware.ts` も同様に調整します。
+
+`src/routeMiddleware.ts`:
+
+```ts
+export const onRequest = defineRouteMiddleware((context) => {
+	// ドキュメントのパス名から最上位の要素を取得
+	// e.g. `/study-astro/root/sub/` returns `/root/`
+	const currentBase = context.url.pathname.split('/').slice(0, 3).join('/') + '/';
 ```
