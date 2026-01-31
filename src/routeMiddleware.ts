@@ -3,7 +3,7 @@ import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 export const onRequest = defineRouteMiddleware((context) => {
 	// ドキュメントのパス名から最上位の要素を取得
 	// e.g. `/root/sub/` returns `/root/`
-	const currentBase = context.url.pathname.split('/').slice(0, 2).join('/') + '/';
+	const currentBase = context.url.pathname.split('/').slice(0, 3).join('/') + '/';
 
 	const { pagination } = context.locals.starlightRoute;
 
