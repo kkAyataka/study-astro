@@ -32,6 +32,12 @@ end_of_line = lf
 indent_style = space
 indent_size = 2
 
+[*.astro]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+
 [*.{cpp,hpp,c,h}]
 indent_style = space
 indent_size = 4
