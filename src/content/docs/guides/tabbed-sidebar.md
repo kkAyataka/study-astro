@@ -1,5 +1,6 @@
 ---
 title: サイドバーを多重化する
+lastUpdated: 2026-02-06
 sidebar:
   order: 4
 ---
@@ -27,12 +28,15 @@ src/content/docs
 * [Overriding Components](https://starlight.astro.build/guides/overriding-components/)
 * [カラーテーマ](https://starlight.astro.build/guides/css-and-tailwind/#color-theme-editor)
 
+GitHub PagesでURLにリポジトリ名（`BASE_URL`）を含む場合は、少し調整します。
+
 `src/components/Sidebar.astro`:
 
 ```astro
 ---
 import Default from "@astrojs/starlight/components/Sidebar.astro";
 
+// GitHub Pagesの場合はリポジトリ名（BASE_URL）も含める
 const links = [
   { label: "Guides", href: "/guides/getting-started/" },
   { label: "Reference", href: "/reference/example/" },
@@ -46,6 +50,10 @@ const isActive = (href) => {
 
   const group = href.substring(0, href.indexOf('/', 1));
   return current.startsWith(group);
+
+  // BASE_URLがある場合は2要素目がグループ名
+  // const group = href.split('/')[2];
+  // return current.split('/')[2] === group;
 };
 ---
 
@@ -119,26 +127,28 @@ const isActive = (href) => {
 
 ```mjs
 export default defineConfig({
-	integrations: [
-		starlight({
-			...
-			components: {
-				// Override the default `SocialIcons` component.
-				Sidebar: './src/components/Sidebar.astro',
-      		},
-		}),
-	],
+  integrations: [
+    starlight({
+      ...
+      components: {
+        // Override the default `SocialIcons` component.
+        Sidebar: './src/components/Sidebar.astro',
+      },
+    }),
+  ],
 });
 ```
 
-## サイドバーに表示するページをフィルタする
+## サイドバーのリンクをフィルタする
 
 リンクボタンは作成できましたが、サイドバーには全てのページが表示されているので、これを必要なもののみにフィルターします。
 
-Starlight Examplesにそのままの例があるので、そちらから拝借します。リファレンスはRoute Dataになります。
+Starlight Examplesにそのままの例があるので、基本はそちらから拝借します。リファレンスはRoute Dataになります。
 
 * [Starlight Examples](https://starlight-examples.netlify.app/examples/multi-sidebar/)
 * [Route Data](https://starlight.astro.build/guides/route-data/)
+
+ただし、単純に使用するだけではGitHub Pagesのリポジトリ名を含むURL（`BASE_URL`）に対応できません。また、トップページでサイドバーを表示する際にもフィルタできないため、少し調整します。
 
 `src/routeMiddleware.ts`:
 
@@ -146,28 +156,45 @@ Starlight Examplesにそのままの例があるので、そちらから拝借�
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 
 export const onRequest = defineRouteMiddleware((context) => {
-	// ドキュメントのパス名から最上位の要素を取得
-	// e.g. `/root/sub/` returns `/root/`
-	const currentBase = context.url.pathname.split('/').slice(0, 2).join('/') + '/';
+  // ドキュメントのパス名を分解
+  const pathComps = context.url.pathname.split('/');
+  const currentBase = (() => {
+    if (import.meta.env.BASE_URL && pathComps.length >= 3) {
+      // baseが指定されている場合は["", base, topGroup]の最低3要素を要求
+      return pathComps.slice(0, 3).join("/") + "/";
+    } else if (!import.meta.env.BASE_URL && pathComps.length >= 2) {
+      // baseがない場合は2要素
+      return pathComps.slice(0, 2).join("/") + "/";
+    } else {
+      // 要素が足りない場合（indexページ）は空
+      return "";
+    }
+  })();
 
-	const { pagination } = context.locals.starlightRoute;
-
-	// サイドバーから同一階層ないにないドキュメントを取り除く
-	context.locals.starlightRoute.sidebar = context.locals.starlightRoute.sidebar.filter(
-		(entry) =>
-			entry.type === 'group' &&
-			entry.entries.some(
-				(subEntry) => subEntry.type === 'link' && subEntry.href.startsWith(currentBase)
-			)
-	);
+  const { pagination } = context.locals.starlightRoute;
+  if (currentBase) {
+    // サイドバーから同一階層ないにないドキュメントを取り除く
+    context.locals.starlightRoute.sidebar = context.locals.starlightRoute.sidebar.filter(
+      (entry) =>
+        entry.type === 'group' &&
+        entry.entries.some(
+          (subEntry) => subEntry.type === 'link' && subEntry.href.startsWith(currentBase)
+        )
+    );
 
     // カテゴリを跨ぐページネーションリンクは作成しない
-	if (pagination.prev && !pagination.prev.href.startsWith(currentBase)) {
-		pagination.prev = undefined;
-	}
-	if (pagination.next && !pagination.next.href.startsWith(currentBase)) {
-		pagination.next = undefined;
-	}
+    if (pagination.prev && !pagination.prev.href.startsWith(currentBase)) {
+      pagination.prev = undefined;
+    }
+    if (pagination.next && !pagination.next.href.startsWith(currentBase)) {
+      pagination.next = undefined;
+    }
+  } else {
+    // currentBaseが空なら全て空にする
+    context.locals.starlightRoute.sidebar = [];
+    pagination.next = undefined;
+    pagination.prev = undefined;
+  }
 });
 ```
 
@@ -177,12 +204,12 @@ export const onRequest = defineRouteMiddleware((context) => {
 
 ```mjs
 export default defineConfig({
-	integrations: [
-		starlight({
-			...
-			routeMiddleware: `./src/routeMiddleware.ts`
-		}),
-	],
+  integrations: [
+    starlight({
+      ...
+      routeMiddleware: `./src/routeMiddleware.ts`
+    }),
+  ],
 });
 ```
 
@@ -194,66 +221,24 @@ export default defineConfig({
 
 ```mjs
 export default defineConfig({
-	integrations: [
-		starlight({
-			sidebar: [
-				{
-					label: 'Guides',
-					autogenerate: { directory: 'guides' },
-				},
-				// Reference
-				{
-					label: 'Sub1',
-					autogenerate: { directory: 'reference/sub1' },
-				},
-				{
-					label: 'Sub2',
-					autogenerate: { directory: 'reference/sub2' },
-				},
-			],
-		}),
-	],
+  integrations: [
+    starlight({
+      sidebar: [
+        {
+          label: 'Guides',
+          autogenerate: { directory: 'guides' },
+        },
+        // Reference
+        {
+          label: 'Sub1',
+          autogenerate: { directory: 'reference/sub1' },
+        },
+        {
+          label: 'Sub2',
+          autogenerate: { directory: 'reference/sub2' },
+        },
+      ],
+    }),
+  ],
 });
-```
-
-## GitHub Pages向けの調整
-
-GitHub Pagesでカスタムドメインを使用しない場合、URLにはリポジトリ名が含まれます。URLが変わるため、これに合わせた調整が必要になります。
-
-`Sidebar.astro` ではリンクを修正するほか、URLの解析時にリポジトリ名は飛ばしてトップディレクトリ名を取得するようにします。
-
-`src/components/Sidebar.astro`:
-
-```astro
----
-import Default from "@astrojs/starlight/components/Sidebar.astro";
-
-// link button data
-const links = [
-  { label: "Guides", href: "/study-astro/guides/getting-started/" },
-  { label: "Reference", href: "/study-astro/reference/sub1/example1/" },
-];
-
-// checks a page is in a link group
-const current = Astro.url.pathname;
-const isActive = (href) => {
-  if (href === "/") {
-    return current === "/";
-  }
-
-  const group = href.split('/')[2];
-  return current.split('/')[2] === group;
-};
----
-```
-
-`routeMiddleware.ts` も同様に調整します。
-
-`src/routeMiddleware.ts`:
-
-```ts
-export const onRequest = defineRouteMiddleware((context) => {
-	// ドキュメントのパス名から最上位の要素を取得
-	// e.g. `/study-astro/root/sub/` returns `/root/`
-	const currentBase = context.url.pathname.split('/').slice(0, 3).join('/') + '/';
 ```
