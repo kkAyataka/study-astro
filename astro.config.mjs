@@ -26,6 +26,9 @@ export default defineConfig({
 					autogenerate: { directory: 'reference/sub2' },
 				},
 			],
+			customCss: [
+				'./src/styles/custom.css',
+			],
 			components: {
 				// Override the default `SocialIcons` component.
 				Sidebar: './src/components/Sidebar.astro',
