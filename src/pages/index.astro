@@ -1,8 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
-import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
-import config from "../../astro.config";
 import { CardGrid, LinkCard} from '@astrojs/starlight/components';
 
 function getUpdatedAt(doc) {
@@ -15,9 +13,10 @@ function getUpdatedAt(doc) {
 }
 
 const docs = await getCollection("docs");
-const updatedDocs = docs.filter(d => d.data.lastUpdated != null).sort((a, b) => a - b).slice(0, 4);
+const updatedDocs = docs.filter(d => d.data.lastUpdated != null)
+  .sort((a, b) => b.data.lastUpdated - a.data.lastUpdated).slice(0, 4);
 const links = updatedDocs.map((doc) => (
-  {href: `${config.base}/${doc.id}`, title: doc.data.title, updatedAt: getUpdatedAt(doc)}
+  {href: `${import.meta.env.BASE_URL}/${doc.id}`, title: doc.data.title, updatedAt: getUpdatedAt(doc)}
 ));
 ---
 
