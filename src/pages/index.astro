@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
+import config from "../../astro.config";
+import { CardGrid, LinkCard} from '@astrojs/starlight/components';
+
+function getUpdatedAt(doc) {
+  const date = doc.data.lastUpdated;
+  if (date) {
+    return date.toDateString();
+  } else {
+    return "";
+  }
+}
+
+const docs = await getCollection("docs");
+const updatedDocs = docs.filter(d => d.data.lastUpdated != null).sort((a, b) => a - b).slice(0, 4);
+const links = updatedDocs.map((doc) => (
+  {href: `${config.base}/${doc.id}`, title: doc.data.title, updatedAt: getUpdatedAt(doc)}
+));
+---
+
+<StarlightPage frontmatter={{ title: "Welcome to Study Astro", template: "doc" }}>
+
+  <!-- search box -->
+  <div id="toppage-search" class="search"></div>
+
+  <CardGrid>
+    {links.map((link) => (
+      <LinkCard title={link.title} href={link.href} description={link.updatedAt} />
+    ))}
+  </CardGrid>
+</StarlightPage>
+
+
+<link href="/study-astro/pagefind/pagefind-ui.css" rel="stylesheet">
+<script is:inline src="/study-astro/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  if (window.PagefindUI) {
+    window.addEventListener('DOMContentLoaded', (event) => {
+      new PagefindUI({ element: "#toppage-search", showSubResults: true });
+    });
+  }
+</script>
+
+
+<!-- https://github.com/withastro/starlight/blob/365d515dbc0d2ba2017279143f0c30f93e7ef5d9/packages/starlight/components/Search.astro#L257-L266 -->
+<style>
+#toppage-search {
+  --pagefind-ui-primary: var(--sl-color-text);
+  --pagefind-ui-text: var(--sl-color-gray-2);
+  --pagefind-ui-font: var(--__sl-font);
+  --pagefind-ui-background: var(--sl-color-black);
+  --pagefind-ui-border: var(--sl-color-gray-5);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-tag: var(--sl-color-gray-5);
+  --sl-search-cancel-space: 5rem;
+}
+</style>
