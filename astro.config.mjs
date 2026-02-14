@@ -30,7 +30,7 @@ export default defineConfig({
 				'./src/styles/custom.css',
 			],
 			components: {
-				// Override the default `SocialIcons` component.
+				// Override the default Sidebar
 				Sidebar: './src/components/Sidebar.astro',
       		},
 			routeMiddleware: `./src/routeMiddleware.ts`
